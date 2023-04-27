@@ -59,12 +59,17 @@ public class ApiStepDefs {
 
         //get information from database
         //connection is from hooks and it will be ready
-        String query = "select firstname,lastname,role from users\n" +
+        String query = "select id,firstname,lastname,role\n" +
+                "from users\n" +
                 "where email = '"+emailGlobal+"'";
 
         Map<String,Object> dbMap = DBUtils.getRowMap(query);
         System.out.println("dbMap = " + dbMap);
         //save db info into variables
+        // System.err.println("dbMap.get(\"id\").toString() = " + dbMap.get("id").toString());
+        int expectedId = Integer.parseInt(dbMap.get("id").toString());
+        System.err.println("expectedId = " + expectedId);
+
         String expectedFirstName = (String) dbMap.get("firstname");
         String expectedLastName = (String) dbMap.get("lastname");
         String expectedRole = (String) dbMap.get("role");
@@ -72,11 +77,14 @@ public class ApiStepDefs {
         //get information from api
         JsonPath jsonPath = response.jsonPath();
         //save api info into variables
+        int actualId = Integer.parseInt(jsonPath.getString("id"));
+
         String actualFirstName = jsonPath.getString("firstName");
         String actualLastName = jsonPath.getString("lastName");
         String actualRole = jsonPath.getString("role");
 
         //compare database vs api
+        Assert.assertEquals(expectedId,actualId);
         Assert.assertEquals(expectedFirstName,actualFirstName);
         Assert.assertEquals(expectedLastName,actualLastName);
         Assert.assertEquals(expectedRole,actualRole);
